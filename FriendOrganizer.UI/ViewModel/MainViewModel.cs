@@ -4,10 +4,12 @@ using System.Collections.ObjectModel;
 
 namespace FriendOrganizer.UI.ViewModel
 {
-    public class MainViewModel
+    public class MainViewModel : ViewModelBase
     {
         private readonly IFriendDataService _friendDataService;
         private Friend _selectedFriend;
+
+
         public MainViewModel(IFriendDataService friendDataService)
         {
             _friendDataService = friendDataService;
@@ -30,7 +32,11 @@ namespace FriendOrganizer.UI.ViewModel
         public Friend SelectedFriend
         {
             get { return _selectedFriend; }
-            set { _selectedFriend = value; }
+            set { _selectedFriend = value;
+                OnPropertyChanged();
+            }
         }
+
+
     }
 }
