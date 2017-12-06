@@ -4,6 +4,8 @@ using FriendOrganizer.UI.Event;
 using Prism.Events;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System;
+using System.Linq;
 
 namespace FriendOrganizer.UI.ViewModel
 {
@@ -12,13 +14,20 @@ namespace FriendOrganizer.UI.ViewModel
         private ILookupDataService _lookupDataService;
         private IEventAggregator _eventAggregator;
 
-        public ObservableCollection<LookupItem> Friends { get; set; }
+        public ObservableCollection<NavigationItemViewModel> Friends { get; set; }
 
         public NavigationViewModel(ILookupDataService lookupDataService, IEventAggregator eventAggregator)
         {
             _lookupDataService = lookupDataService;
             _eventAggregator = eventAggregator;
-            Friends = new ObservableCollection<LookupItem>();
+            Friends = new ObservableCollection<NavigationItemViewModel>();
+            _eventAggregator.GetEvent<AfterFriendSavedEvent>().Subscribe(AfterFriendSaved);
+        }
+
+        private void AfterFriendSaved(AfterFriendSavedEventArgs obj)
+        {
+            var lookupItem = Friends.Single(l => l.Id == obj.Id);
+            lookupItem.DisplayMember = obj.DisplayMember;
         }
 
         public async Task LoadAsync()
@@ -27,13 +36,13 @@ namespace FriendOrganizer.UI.ViewModel
             Friends.Clear();
             foreach(var item in lookup)
             {
-                Friends.Add(item);
+                Friends.Add(new NavigationItemViewModel(item.Id,item.DisplayMember));
             }
         }
 
-        private LookupItem selectedFriend ;
+        private NavigationItemViewModel selectedFriend ;
 
-        public LookupItem SelectedFriend 
+        public NavigationItemViewModel SelectedFriend 
         {
             get { return selectedFriend; }
             set

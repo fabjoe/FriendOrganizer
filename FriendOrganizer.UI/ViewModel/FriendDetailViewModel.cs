@@ -1,5 +1,6 @@
 ﻿using FriendOrganizer.Model;
 using FriendOrganizer.UI.Data;
+using FriendOrganizer.UI.Event;
 using Prism.Commands;
 using Prism.Events;
 using System;
@@ -27,12 +28,14 @@ namespace FriendOrganizer.UI.ViewModel
 
         private bool OnSaveCanExecute()
         {
-            throw new NotImplementedException();
+            
+            return true;
         }
 
-        private void OnSaveExecute()
+        private async void OnSaveExecute()
         {
-            throw new NotImplementedException();
+            await _friendDataService.SaveAsync(Friend);
+            _eventAggregator.GetEvent<AfterFriendSavedEvent>().Publish(new AfterFriendSavedEventArgs { Id = Friend.Id, DisplayMember = $"{Friend.FirstName} {Friend.LastName}" });
         }
 
         private async void OnOpenFriendDetailView(int friendId)
