@@ -1,6 +1,7 @@
 ﻿using FriendOrganizer.Model;
 using FriendOrganizer.UI.Data;
 using FriendOrganizer.UI.Event;
+using FriendOrganizer.UI.Wrapper;
 using Prism.Commands;
 using Prism.Events;
 using System;
@@ -16,6 +17,7 @@ namespace FriendOrganizer.UI.ViewModel
     {
         private IFriendDataService _friendDataService;
         private IEventAggregator _eventAggregator;
+        private FriendWrapper _friend;
 
         public FriendDetailViewModel(IFriendDataService friendDataService, IEventAggregator eventAggregator)
         {
@@ -34,7 +36,7 @@ namespace FriendOrganizer.UI.ViewModel
 
         private async void OnSaveExecute()
         {
-            await _friendDataService.SaveAsync(Friend);
+            await _friendDataService.SaveAsync(Friend.Model);
             _eventAggregator.GetEvent<AfterFriendSavedEvent>().Publish(new AfterFriendSavedEventArgs { Id = Friend.Id, DisplayMember = $"{Friend.FirstName} {Friend.LastName}" });
         }
 
@@ -45,11 +47,11 @@ namespace FriendOrganizer.UI.ViewModel
 
         public async Task LoadAsync(int friendId)
         {
-            Friend = await _friendDataService.GetByIdAsync(friendId);
+            var friend = await _friendDataService.GetByIdAsync(friendId);
+            Friend = new FriendWrapper(friend);
         }
 
-        private Friend _friend;
-        public Friend Friend
+        public FriendWrapper Friend
         {
             get
             {
